@@ -128,6 +128,14 @@ article {
 
 There's also `@for`, `@each` and `@while`.
 
+## The list data type
+
+TODO
+
+## Color arithmetic
+
+TODO
+
 ## Math (and other) functions
 
 http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html
@@ -155,11 +163,41 @@ p {
 }
 ```
 
-## The list data type
+## Argument defaults for functions/mixins
 
-## Color arithmetic
+```scss
+@mixin foobar($a, $b, $padding: 20px) {
+    // do something with all these arguments...
+}
+
+p {
+    @include foobar(123, "abc");
+}
+
+p.important {
+    @include foobar(123, "abc", 50px);
+}
+```
 
 ## Keyword arguments
+
+If you have a huge helper with:
+
+```scss
+@mixin foobar($a: 1px, $b: 2px, $c: 3px, $d: 4px, $e: 5px) {
+    // do something with all these arguments...
+}
+
+p {
+    @include foobar($c: 50px); // specify only the argument you want to override
+}
+```
+
+## Variable arguments for functions/mixins
+
+...and expanding and/or extending during further calls.
+
+## Content block arguments for mixins
 
 ## Variable interpolation in selectors
 
@@ -171,12 +209,5 @@ p {
 
 ...with multiple inheritance.
 
-## Argument defaults for functions/mixins
-
-## Variable arguments for functions/mixins
-
-...and expanding and/or extending during further calls.
-
-## Content block arguments for mixins
-
 ## Placeholder selectors
+
