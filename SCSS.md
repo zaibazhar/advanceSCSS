@@ -8,9 +8,47 @@
  * [Variables](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variables_)
  * [Mixins](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins)
 
-## Placeholder selectors
-
 ## Prefixing parent selector references
+
+Familiar way:
+
+```scss
+a {
+    &:hover {
+        color: red;
+    }
+}
+```
+Compiles into:
+```css
+/* compiled CSS */
+a:hover {
+  color: red;
+}
+```
+
+But can be used with a prefix just as well:
+
+```scss
+p {
+    body.no-touch & {
+        display: none;
+    }
+}
+```
+
+Gives you:
+
+```css
+/* compiled CSS */
+body.no-touch p {
+  display: none;
+}
+```
+
+## Media query bubbling
+
+## Media query nesting
 
 ## The list data type
 
@@ -25,10 +63,6 @@
 ...or almost anywhere else, for that matter.
 
 ## Variable defaults
-
-## Media query bubbling
-
-## Media query nesting
 
 ## Extending classes
 
@@ -46,3 +80,4 @@
 
 ## Math (and other) functions
 
+## Placeholder selectors
