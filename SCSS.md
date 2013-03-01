@@ -199,6 +199,47 @@ p {
 
 ## Content block arguments for mixins
 
+```scss
+@mixin only-for-mobile {
+    @media (max-width: 768px) {
+        @content;
+    }
+}
+
+p {
+    @include only-for-mobile {
+        font-size: 150%;
+    }
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+@media (max-width: 768px) {
+  p {
+    font-size: 150%;
+  }
+}
+```
+
+You can mix standard and content block arguments, too:
+
+```scss
+@mixin only-for-mobile($breakpoint) {
+    @media (max-width: #{$breakpoint}) {
+        @content;
+    }
+}
+
+p {
+    @include only-for-mobile(768px) {
+        font-size: 150%;
+    }
+}
+```
+
 ## Variable interpolation in selectors
 
 ...or almost anywhere else, for that matter.
