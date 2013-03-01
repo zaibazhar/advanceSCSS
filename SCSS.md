@@ -48,7 +48,59 @@ body.no-touch p {
 
 ## Media query bubbling
 
+```scss
+p {
+    @media (max-width: 768px) {
+        // Use larger text for smaller screens:
+        font-size: 150%;
+    }
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+@media (max-width: 768px) {
+  p {
+    font-size: 150%;
+  }
+}
+```
+
 ## Media query nesting
+
+```scss
+p {
+    @media (max-width: 768px) {
+
+        // Use larger text for smaller screens:
+        font-size: 150%;
+
+        @media (orientation: landscape) {
+
+            // Condense text a bit because of small vertical space:
+            line-height: 75%;
+        }
+    }
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+@media (max-width: 768px) {
+  p {
+    font-size: 150%;
+  }
+}
+@media (max-width: 768px) and (orientation: landscape) {
+  p {
+    line-height: 75%;
+  }
+}
+```
 
 ## The list data type
 
