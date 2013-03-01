@@ -102,11 +102,39 @@ Compiles into:
 }
 ```
 
+## Control directives
+
+```scss
+$debug: false; // this would likely be in a _settings.scss somewhere
+
+article {
+
+    color: black;
+
+    @if ($debug) {
+        border: 1px dotted red;
+    }
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+article {
+  color: black;
+}
+```
+
+There's also `@for`, `@each` and `@while`.
+
+## Math (and other) functions
+
+## Defining custom functions
+
 ## The list data type
 
 ## Color arithmetic
-
-## Defining custom functions
 
 ## Keyword arguments
 
@@ -120,8 +148,6 @@ Compiles into:
 
 ...with multiple inheritance.
 
-## Control directives
-
 ## Argument defaults for functions/mixins
 
 ## Variable arguments for functions/mixins
@@ -129,7 +155,5 @@ Compiles into:
 ...and expanding and/or extending during further calls.
 
 ## Content block arguments for mixins
-
-## Math (and other) functions
 
 ## Placeholder selectors
