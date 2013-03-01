@@ -130,7 +130,30 @@ There's also `@for`, `@each` and `@while`.
 
 ## Math (and other) functions
 
+http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html
+
 ## Defining custom functions
+
+No Ruby needed:
+
+```scss
+@function add-padding($toValue) {
+    @return $toValue + 20px;
+}
+
+p {
+    margin: add-padding(50px);
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+p {
+  margin: 70px;
+}
+```
 
 ## The list data type
 
