@@ -145,12 +145,12 @@ http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html
 No Ruby needed:
 
 ```scss
-@function add-padding($toValue) {
-    @return $toValue + 20px;
+@function make-more-spacious($value) {
+    @return $value + 20px;
 }
 
 p {
-    margin: add-padding(50px);
+    margin: make-more-spacious(50px);
 }
 ```
 
@@ -184,14 +184,16 @@ p.important {
 If you have a huge helper with:
 
 ```scss
-@mixin foobar($a: 1px, $b: 2px, $c: 3px, $d: 4px, $e: 5px) {
+@mixin foobar($topPadding: 10px, $rightPadding: 20px, $bottomPadding: 10px, $leftPadding: 20px, $evenMorePadding: 10px) {
     // do something with all these arguments...
 }
 
 p {
-    @include foobar($c: 50px); // specify only the argument you want to override
+    @include foobar($bottomPadding: 50px); // specify only the argument you want to override
 }
 ```
+
+Note the `@include mixin() { overrides; }` pattern too.
 
 ## Variable arguments for functions/mixins
 
