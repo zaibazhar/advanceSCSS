@@ -242,7 +242,41 @@ p {
 
 ## Variable interpolation in selectors
 
+```scss
+$alertClass: "error";
+
+p.message-#{$alertClass} {
+    color: red;
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+p.message-error {
+  color: red;
+}
+```
+
 ...or almost anywhere else, for that matter.
+
+```scss
+$breakpoint: 768px; // this would likely go to a _settings.scss somewhere
+
+@media (max-width: #{$breakpoint}) {
+    /* This block only applies to viewports <= #{$breakpoint} wide... */
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+@media (max-width: 768px) {
+  /* This block only applies to viewports <= 768px wide... */
+}
+```
 
 ## Variable defaults
 
