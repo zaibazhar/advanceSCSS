@@ -46,14 +46,32 @@ body.no-touch p {
 }
 ```
 
-## Media query bubbling
+## Variable interpolation in selectors
 
 ```scss
-p {
-    @media (max-width: 768px) {
-        // Use larger text for smaller screens:
-        font-size: 150%;
-    }
+$alertClass: "error";
+
+p.message-#{$alertClass} {
+    color: red;
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+p.message-error {
+  color: red;
+}
+```
+
+...or almost anywhere else, for that matter.
+
+```scss
+$breakpoint: 768px; // this would likely go to a _settings.scss somewhere
+
+@media (max-width: #{$breakpoint}) {
+    /* This block only applies to viewports <= #{$breakpoint} wide... */
 }
 ```
 
@@ -62,45 +80,13 @@ Compiles into:
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
-  p {
-    font-size: 150%;
-  }
+  /* This block only applies to viewports <= 768px wide... */
 }
 ```
 
-## Media query nesting
+## Variable defaults
 
-```scss
-p {
-    @media (max-width: 768px) {
-
-        // Use larger text for smaller screens:
-        font-size: 150%;
-
-        @media (orientation: landscape) {
-
-            // Condense text a bit because of small vertical space:
-            line-height: 75%;
-        }
-    }
-}
-```
-
-Compiles into:
-
-```css
-/* compiled CSS */
-@media (max-width: 768px) {
-  p {
-    font-size: 150%;
-  }
-}
-@media (max-width: 768px) and (orientation: landscape) {
-  p {
-    line-height: 75%;
-  }
-}
-```
+TODO
 
 ## Control directives
 
@@ -208,8 +194,8 @@ Note the `@include mixin() { overrides; }` pattern too.
     }
 }
 
-p {
-    @include only-for-mobile {
+@include only-for-mobile {
+    p {
         font-size: 150%;
     }
 }
@@ -235,39 +221,21 @@ You can mix standard and content block arguments, too:
     }
 }
 
-p {
-    @include only-for-mobile(768px) {
+@include only-for-mobile(480px) {
+    p {
         font-size: 150%;
     }
 }
 ```
 
-## Variable interpolation in selectors
+## Media query bubbling
 
 ```scss
-$alertClass: "error";
-
-p.message-#{$alertClass} {
-    color: red;
-}
-```
-
-Compiles into:
-
-```css
-/* compiled CSS */
-p.message-error {
-  color: red;
-}
-```
-
-...or almost anywhere else, for that matter.
-
-```scss
-$breakpoint: 768px; // this would likely go to a _settings.scss somewhere
-
-@media (max-width: #{$breakpoint}) {
-    /* This block only applies to viewports <= #{$breakpoint} wide... */
+p {
+    @media (max-width: 768px) {
+        // Use larger text for smaller screens:
+        font-size: 150%;
+    }
 }
 ```
 
@@ -276,11 +244,45 @@ Compiles into:
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
-  /* This block only applies to viewports <= 768px wide... */
+  p {
+    font-size: 150%;
+  }
 }
 ```
 
-## Variable defaults
+## Media query nesting
+
+```scss
+p {
+    @media (max-width: 768px) {
+
+        // Use larger text for smaller screens:
+        font-size: 150%;
+
+        @media (orientation: landscape) {
+
+            // Condense text a bit because of small vertical space:
+            line-height: 75%;
+        }
+    }
+}
+```
+
+Compiles into:
+
+```css
+/* compiled CSS */
+@media (max-width: 768px) {
+  p {
+    font-size: 150%;
+  }
+}
+@media (max-width: 768px) and (orientation: landscape) {
+  p {
+    line-height: 75%;
+  }
+}
+```
 
 ## Extending classes
 
@@ -288,3 +290,4 @@ Compiles into:
 
 ## Placeholder selectors
 
+TODO
