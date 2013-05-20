@@ -10,8 +10,7 @@
 
 ## Prefixing parent selector references
 
-Familiar way:
-
+The familiar way:
 ```scss
 a {
     &:hover {
@@ -19,16 +18,13 @@ a {
     }
 }
 ```
-Compiles into:
 ```css
 /* compiled CSS */
 a:hover {
   color: red;
 }
 ```
-
-But can be used with a prefix just as well:
-
+But `&` can be used with a prefix just as well:
 ```scss
 p {
     body.no-touch & {
@@ -36,18 +32,17 @@ p {
     }
 }
 ```
-
-Gives you:
-
 ```css
 /* compiled CSS */
 body.no-touch p {
   display: none;
 }
 ```
+This can be very useful when you have a deep nesting of rules already in place, and you want to effect a change to the styling of an element based on a selector match much closer to the DOM root.  Client capability flags such as the `no-touch` class are often applied in such a way, to the `<body>` element for example.
 
 ## Variable interpolation in selectors
 
+Variables can be expanded in selectors, too:
 ```scss
 $alertClass: "error";
 
@@ -55,18 +50,13 @@ p.message-#{$alertClass} {
     color: red;
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 p.message-error {
   color: red;
 }
 ```
-
-...or almost anywhere else, for that matter.
-
+...or almost anywhere else for that matter, like in media queries or CSS comments:
 ```scss
 $breakpoint: 768px; // this would likely go to a _settings.scss somewhere
 
@@ -74,9 +64,6 @@ $breakpoint: 768px; // this would likely go to a _settings.scss somewhere
     /* This block only applies to viewports <= #{$breakpoint} wide... */
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
@@ -86,37 +73,111 @@ Compiles into:
 
 ## Variable defaults
 
-TODO
+If your SCSS module can be configured using globals (which tends to be the SCSS way), you can declare them with a default value:
+```scss
+// _my-module.scss:
+$message-color: blue !default;
+
+p.message {
+    color: $message-color;
+}
+```
+```css
+/* compiled CSS */
+p.message {
+  color: blue;
+}
+```
+But you can then optionally override the module defaults before its inclusion:
+```scss
+$message-color: black;
+@import 'my-module';
+```
+```css
+/* compiled CSS */
+p.message {
+  color: black;
+}
+```
+That is, an assignment with a `!default` will only take effect if such a variable didn't have a value before (in contrast to the standard assignment, which will always overwrite a possible previous value).
+
+This is how many SCSS modules (including most that ship with Compass) are configured.
 
 ## Control directives
 
+SCSS sports the standard set of flow control directives, such as `if`:
 ```scss
 $debug: false; // this would likely be in a _settings.scss somewhere
 
 article {
-
     color: black;
 
-    @if ($debug) {
+    @if ($debug) { // visualizing layout internals
         border: 1px dotted red;
     }
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 article {
   color: black;
 }
 ```
+Having such compile-time flags in your project's styling can help debug complex layout issues visually, faster than just inspecting the page an element at a time.
 
-There's also `@for`, `@each` and `@while`.
+There's also `@for`, `@each` and `@while`.  They're good for a number of things, like:
+```scss
+@each $name in 'save' 'cancel' 'help' {
+    .icon-#{$name} {
+        background-image: url('/images/#{$name}.png');
+    }
+}
+```
+```css
+/* compiled CSS */
+.icon-save {
+  background-image: url("/images/save.png");
+}
+.icon-cancel {
+  background-image: url("/images/cancel.png");
+}
+.icon-help {
+  background-image: url("/images/help.png");
+}
+```
+...and much more.  Keep in mind, though, that if you need them in your daily styling work you're probably overdoing it.  Instead, they usually warrant the added complexity when building configurable SCSS modules and other such reusable components.
+
+The interested reader can check out the [full documentation on the subject](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#control_directives).
 
 ## The list data type
 
-TODO
+As we saw in the previous example, `@each` can iterate over a list.  Lists are in fact a [fundamental part](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#lists) of the SCSS language, but a quick demo of their application might be configuring some generated styling:
+```scss
+$buttonConfig: 'save' 50px, 'cancel' 50px, 'help' 100px;
+
+@each $tuple in $buttonConfig {
+    .button-#{nth($tuple, 1)} {
+        width: nth($tuple, 2);
+    }
+}
+```
+```css
+/* compiled CSS */
+.button-save {
+  width: 50px;
+}
+.button-cancel {
+  width: 50px;
+}
+.button-help {
+  width: 100px;
+}
+```
+This demonstrates two features of the list data type, namely the `nth()` [list accessor function](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#nth-instance_method), and more interestingly list nestability: in JavaScript notation, the above would be equivalent to:
+```js
+var buttonConfig = [[ 'save', 50 ], [ 'cancel', 50 ], [ 'help', 100 ]];
+```
+That is, lists can be separated by both spaces and commas, and alternation between the two notations is also allowed.
 
 ## Color arithmetic
 
