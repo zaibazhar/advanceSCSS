@@ -177,38 +177,28 @@ This demonstrates two features of the list data type, namely the `nth()` [list a
 ```js
 var buttonConfig = [[ 'save', 50 ], [ 'cancel', 50 ], [ 'help', 100 ]];
 ```
-That is, lists can be separated by both spaces and commas, and alternation between the two notations is also allowed.
-
-## Color arithmetic
-
-TODO
-
-## Math (and other) functions
-
-http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html
+That is, lists can be separated by both spaces and commas, and alternation between the two notations produces nested arrays.
 
 ## Defining custom functions
 
-No Ruby needed:
-
+[Mixins](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins) are a well-known part of the language, but SCSS also allows you to define custom functions.  Contrary to what one might expect, this can also be done in pure SCSS, instead of [extending SCSS in Ruby](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#adding_custom_functions):
 ```scss
-@function make-more-spacious($value) {
-    @return $value + 20px;
+@function make-greener($value) {
+    @return $value + rgb(0,50,0); // arithmetic with colors is _b
 }
-
 p {
-    margin: make-more-spacious(50px);
+    background: make-greener(gray);
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 p {
-  margin: 70px;
+  background: #80b280;
 }
 ```
+The above color is a gray with a slight green tint.
+
+Functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents it by giving it a name.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own helper.
 
 ## Argument defaults for functions/mixins
 
