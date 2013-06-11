@@ -200,25 +200,28 @@ The above color is a gray with a slight green tint.
 
 Functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents it by giving it a name.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own helper.
 
-## Argument defaults for functions/mixins
+## Argument defaults
+
+Arguments and functions support default values for arguments; the *final* 0-N arguments can be made optional by providing them with a default value:
 
 ```scss
 @mixin foobar($a, $b, $padding: 20px) {
-    // do something with all these arguments...
+    padding: $padding;
+    // ...and something with $a and $b
 }
 
 p {
-    @include foobar(123, "abc");
+    @include foobar(123, "abc"); // the default padding's fine
 }
 
 p.important {
-    @include foobar(123, "abc", 50px);
+    @include foobar(123, "abc", 50px); // override the default
 }
 ```
 
 ## Keyword arguments
 
-If you have a huge helper with:
+If your mixin (or function) takes a lot of arguments, there's a similar call-time syntax for selecting only specific arguments to override:
 
 ```scss
 @mixin foobar($topPadding: 10px, $rightPadding: 20px, $bottomPadding: 10px, $leftPadding: 20px, $evenMorePadding: 10px) {
@@ -230,13 +233,15 @@ p {
 }
 ```
 
-Note the `@include mixin() { overrides; }` pattern too.
+In cases where a lot of the arguments are just for overriding specific style properties, however, the "content block overrides -pattern" may work a lot better (see below).
 
 ## Variable arguments for functions/mixins
 
-...and expanding and/or extending during further calls.
+TODO: ...and expanding and/or extending during further calls.
 
 ## Content block arguments for mixins
+
+Since version TODO, SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
 
 ```scss
 @mixin only-for-mobile {
@@ -245,15 +250,12 @@ Note the `@include mixin() { overrides; }` pattern too.
     }
 }
 
-@include only-for-mobile {
+@include only-for-mobile() /* content begins */ {
     p {
         font-size: 150%;
     }
-}
+} /* content ends */
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
@@ -263,7 +265,9 @@ Compiles into:
 }
 ```
 
-You can mix standard and content block arguments, too:
+This is a very powerful feature.  You can mix standard and content block arguments, too:
+
+TODO
 
 ```scss
 @mixin only-for-mobile($breakpoint) {
@@ -278,6 +282,10 @@ You can mix standard and content block arguments, too:
     }
 }
 ```
+
+## Content block overrides -pattern
+
+...
 
 ## Media query bubbling
 
