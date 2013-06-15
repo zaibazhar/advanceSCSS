@@ -237,7 +237,52 @@ In cases where a lot of the arguments are just for overriding specific style pro
 
 ## Variable arguments for functions/mixins
 
-TODO: ...and expanding and/or extending during further calls.
+[Var-args](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_arguments) work much the same way as in other languages that support the feature; any extra arguments to a function/mixin call are wrapped into a list and assigned to the argument having a `...` suffix:
+
+```scss
+@mixin config-icon-colors($prefix, $colors...) {
+    @each $i in $colors {
+        .#{$prefix}#{nth($i, 1)} {
+            color: nth($i, 2);
+        }
+    }
+}
+@include config-icon-colors(
+    'icon-',
+    'save'   green,
+    'cancel' gray,
+    'delete' red
+);
+```
+```css
+/* compiled CSS */
+.icon-save {
+  color: green;
+}
+.icon-cancel {
+  color: gray;
+}
+.icon-delete {
+  color: red;
+}
+```
+
+The above helper could be used to set up colors for your font icons, [Font Awesome](http://fortawesome.github.io/Font-Awesome/) for example.  It works by passing in a variable number of arguments (after the first, required one).  Each of those arguments is expected to be a tuple of two items (again in JavaScript notation, for example `[ "save", "green" ]`).
+
+The `...` syntax in fact also works during call-time.  When used this way, it expands a list into separate arguments, to be fed into the target mixin:
+
+```scss
+@mixin foobar($a, $b, $c) {
+    // receives args $a = 5px, $b = red and so on
+}
+
+$myArgs: 5px red "bla bla";
+// at this point, you could also programmatically add/remove arguments
+
+@include foobar($myArgs...);
+```
+
+Personally, I have yet to find a use case for this, but [the documentation](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_arguments) has a nice use case for passing current arguments forward to another mixin.
 
 ## Content block arguments for mixins
 
@@ -250,11 +295,11 @@ Since version TODO, SCSS has had an implicit mixin argument accessible through t
     }
 }
 
-@include only-for-mobile() /* content begins */ {
+@include only-for-mobile() /* @content begins */ {
     p {
         font-size: 150%;
     }
-} /* content ends */
+} /* @content ends */
 ```
 ```css
 /* compiled CSS */
