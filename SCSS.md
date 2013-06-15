@@ -10,7 +10,7 @@
 
 ## Prefixing parent selector references
 
-The familiar way:
+This is the familiar way:
 ```scss
 a {
     &:hover {
@@ -38,7 +38,7 @@ body.no-touch p {
   display: none;
 }
 ```
-This can be very useful when you have a deep nesting of rules already in place, and you want to effect a change to the styling of an element based on a selector match much closer to the DOM root.  Client capability flags such as the `no-touch` class are often applied in such a way, to the `<body>` element for example.
+This can be very useful when you have a deep nesting of rules already in place, and you want to effect a change to the styling of an element based on a selector match much closer to the DOM root.  Client capability flags such as the [Modernizr](http://modernizr.com/docs/) `no-touch` class are often applied this way to the `<body>` element.
 
 ## Variable interpolation in selectors
 
@@ -58,7 +58,7 @@ p.message-error {
 ```
 ...or almost anywhere else for that matter, like in media queries or CSS comments:
 ```scss
-$breakpoint: 768px; // this would likely go to a _settings.scss somewhere
+$breakpoint: 768px;
 
 @media (max-width: #{$breakpoint}) {
     /* This block only applies to viewports <= #{$breakpoint} wide... */
@@ -70,6 +70,8 @@ $breakpoint: 768px; // this would likely go to a _settings.scss somewhere
   /* This block only applies to viewports <= 768px wide... */
 }
 ```
+
+The media query example is particularly useful if the `$breakpoint` variable is defined in a `_settings.scss`, so the breakpoints of the entire application are configurable from one file.
 
 ## Variable defaults
 
@@ -107,7 +109,7 @@ This is how many SCSS modules (including most that ship with Compass) are config
 
 SCSS sports the standard set of flow control directives, such as `if`:
 ```scss
-$debug: false; // this would likely be in a _settings.scss somewhere
+$debug: false; // TODO: move to _settings.scss
 
 article {
     color: black;
@@ -125,7 +127,7 @@ article {
 ```
 Having such compile-time flags in your project's styling can help debug complex layout issues visually, faster than just inspecting the page an element at a time.
 
-There's also `@for`, `@each` and `@while`.  They're good for a number of things, like:
+There's also `@for`, `@each` and `@while`.  They're good for a number of use cases that would otherwise need lots of repetitive (S)CSS, like:
 ```scss
 @each $name in 'save' 'cancel' 'help' {
     .icon-#{$name} {
@@ -147,13 +149,13 @@ There's also `@for`, `@each` and `@while`.  They're good for a number of things,
 ```
 ...and much more.  Keep in mind, though, that if you need them in your daily styling work you're probably overdoing it.  Instead, they usually warrant the added complexity when building configurable SCSS modules and other such reusable components.
 
-The interested reader can check out the [full documentation on the subject](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#control_directives).
+The interested reader can check out the [full documentation on control directives](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#control_directives).
 
 ## The list data type
 
 As we saw in the previous example, `@each` can iterate over a list.  Lists are in fact a [fundamental part](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#lists) of the SCSS language, but a quick demo of their application might be configuring some generated styling:
 ```scss
-$buttonConfig: 'save' 50px, 'cancel' 50px, 'help' 100px;
+$buttonConfig: 'save' 50px, 'cancel' 50px, 'help' 100px; // TODO: move to _settings.scss
 
 @each $tuple in $buttonConfig {
     .button-#{nth($tuple, 1)} {
@@ -177,7 +179,7 @@ This demonstrates two features of the list data type, namely the `nth()` [list a
 ```js
 var buttonConfig = [[ 'save', 50 ], [ 'cancel', 50 ], [ 'help', 100 ]];
 ```
-That is, lists can be separated by both spaces and commas, and alternation between the two notations produces nested arrays.
+That is, lists can be separated by both spaces and commas, and alternation between the two notations produces nested lists.
 
 ## Defining custom functions
 
@@ -198,11 +200,11 @@ p {
 ```
 The above color is a gray with a slight green tint.
 
-Functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents it by giving it a name.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own helper.
+Functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents that computation by giving it a name: the above example, while contrived, is still more understandable than just having arbitrary color arithmetic in the style block.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own helper.
 
 ## Argument defaults
 
-Arguments and functions support default values for arguments; the *final* 0-N arguments can be made optional by providing them with a default value:
+Arguments and functions support default values for arguments; the *last* zero-to-N arguments can be made optional by providing them with a default value:
 
 ```scss
 @mixin foobar($a, $b, $padding: 20px) {
@@ -221,7 +223,7 @@ p.important {
 
 ## Keyword arguments
 
-If your mixin (or function) takes a lot of arguments, there's a similar call-time syntax for selecting only specific arguments to override:
+If your mixin (or function) takes *a lot* of arguments, there's a similar call-time syntax for selecting only specific arguments to override:
 
 ```scss
 @mixin foobar($topPadding: 10px, $rightPadding: 20px, $bottomPadding: 10px, $leftPadding: 20px, $evenMorePadding: 10px) {
@@ -233,7 +235,7 @@ p {
 }
 ```
 
-In cases where a lot of the arguments are just for overriding specific style properties, however, the "content block overrides -pattern" may work a lot better (see below).
+However, in cases where a lot of the arguments are just for overriding specific CSS properties (such as `top-padding`, `bottom-padding` and so on), the "content block overrides -pattern" is likely a better fit (see below).
 
 ## Variable arguments for functions/mixins
 
@@ -247,8 +249,7 @@ In cases where a lot of the arguments are just for overriding specific style pro
         }
     }
 }
-@include config-icon-colors(
-    'icon-',
+@include config-icon-colors('icon-',
     'save'   green,
     'cancel' gray,
     'delete' red
@@ -267,13 +268,13 @@ In cases where a lot of the arguments are just for overriding specific style pro
 }
 ```
 
-The above helper could be used to set up colors for your font icons, [Font Awesome](http://fortawesome.github.io/Font-Awesome/) for example.  It works by passing in a variable number of arguments (after the first, required one).  Each of those arguments is expected to be a tuple of two items (again in JavaScript notation, for example `[ "save", "green" ]`).
+The above helper could be used to set up colors for your font icons, [Font Awesome](http://fortawesome.github.io/Font-Awesome/) for example, without having to repeat yourself.  The helper works by passing in a variable number of arguments (after the first, required one).  Each of those arguments is expected to be a tuple of two items (again in JavaScript notation, for example `[ "save", "green" ]`).
 
-The `...` syntax in fact also works during call-time.  When used this way, it expands a list into separate arguments, to be fed into the target mixin:
+In fact, the `...` syntax also works during call-time, where it expands a list into separate arguments, to be fed into the target mixin:
 
 ```scss
 @mixin foobar($a, $b, $c) {
-    // receives args $a = 5px, $b = red and so on
+    // receives args $a = 5px, $b = red, and so on
 }
 
 $myArgs: 5px red "bla bla";
@@ -286,7 +287,7 @@ Personally, I have yet to find a use case for this, but [the documentation](http
 
 ## Content block arguments for mixins
 
-Since version TODO, SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
+Since version [3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#320_10_august_2012), SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
 
 ```scss
 @mixin only-for-mobile {
@@ -310,9 +311,7 @@ Since version TODO, SCSS has had an implicit mixin argument accessible through t
 }
 ```
 
-This is a very powerful feature.  You can mix standard and content block arguments, too:
-
-TODO
+This is a very powerful language feature.  You can mix standard and content block arguments, too:
 
 ```scss
 @mixin only-for-mobile($breakpoint) {
