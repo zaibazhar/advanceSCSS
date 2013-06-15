@@ -394,18 +394,14 @@ This pattern can be useful in any library code that outputs nontrivial styling w
 
 ## Media query bubbling
 
-`@media` blocks
+`@media` blocks do not need to be declared at the root level of the stylesheet:
 ```scss
 p {
     @media (max-width: 768px) {
-        // Use larger text for smaller screens:
-        font-size: 150%;
+        font-size: 150%; // use larger text for smaller screens
     }
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
@@ -414,27 +410,23 @@ Compiles into:
   }
 }
 ```
+Notice how the compiler "bubbles up" the `@media` block to the root level (since regular CSS doesn't support selector nesting), and then outputs within all styling and the corresponding selectors that were encountered within the `@media` block in the SCSS source.
+
+This is very useful as it allows you to make media-specific tweaks almost anywhere in your styling, right where they're relevant, instead of collecting all those tweaks to the end of the stylesheet, and hoping that their selectors will stay in sync with the ones they're overriding (they won't).
 
 ## Media query nesting
 
+The aforementioned bubbling mechanism also takes nesting into account, and combines all applicable queries with the `and` media query operator:
 ```scss
 p {
     @media (max-width: 768px) {
-
-        // Use larger text for smaller screens:
-        font-size: 150%;
-
+        font-size: 150%; // use larger text for smaller screens
         @media (orientation: landscape) {
-
-            // Condense text a bit because of small vertical space:
-            line-height: 75%;
+            line-height: 75%; // condense text a bit because of small vertical space
         }
     }
 }
 ```
-
-Compiles into:
-
 ```css
 /* compiled CSS */
 @media (max-width: 768px) {
