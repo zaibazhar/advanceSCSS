@@ -287,7 +287,7 @@ Personally, I have yet to find a use case for this, but [the documentation](http
 
 ## Content block arguments for mixins
 
-Since version [3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#320_10_august_2012), SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
+Since [version 3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#320_10_august_2012), SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
 
 ```scss
 @mixin only-for-mobile {
@@ -296,7 +296,7 @@ Since version [3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#
     }
 }
 
-@include only-for-mobile() /* @content begins */ {
+@include only-for-mobile() /* note: @content begins here */ {
     p {
         font-size: 150%;
     }
@@ -329,10 +329,72 @@ This is a very powerful language feature.  You can mix standard and content bloc
 
 ## Content block overrides -pattern
 
-...
+Consider a mixin that generates a selector and a corresponding style block, allowing the caller to customize the styling if needed:
+```scss
+@mixin message($class, $color: yellow, $margin: 20px, $padding: 10px) {
+    .message-#{$class} {
+        border: 1px dotted $color;
+        color: $color;
+        margin: $margin;
+        padding: $padding;
+    }
+}
+```
+Calling this mixin using keyword arguments (see above) is quite convenient, because if the defaults are fine, no extra arguments need be provided.  If they're not, you only need to specify the arguments you want to override:
+```scss
+@include message("subtle", $margin: 5px);
+```
+But this requires you to list *all overridable properties* in the mixin signature.  However, content block arguments allow arbitrary overrides without the argument jungle:
+```scss
+@mixin message($class) {
+    .message-#{$class} {
+        border: 1px dotted yellow;
+        color: yellow;
+        margin: 20px;
+        padding: 10px;
+        @content;
+    }
+}
+
+@include message("subtle") {
+    margin: 5px;
+}
+```
+```css
+/* compiled CSS */
+.message-subtle {
+  border: 1px dotted yellow;
+  color: yellow;
+  margin: 20px;
+  padding: 10px;
+  margin: 5px;
+}
+```
+Here, we allow the good-ole CSS cascade to effect the property override (the latter `margin` overrides the former one).  Also, we're not limited to overriding the properties the author of the mixin thought of.  In fact, this allows passing in nested blocks as well:
+```scss
+@include message("actionable") {
+    button {
+        float: right;
+    }
+}
+```
+```css
+/* compiled CSS */
+.message-actionable {
+  border: 1px dotted yellow;
+  color: yellow;
+  margin: 20px;
+  padding: 10px;
+}
+.message-actionable button {
+  float: right;
+}
+```
+This pattern can be useful in any library code that outputs nontrivial styling with generated selectors; in simple cases (where no selectors are emitted within the mixin) it's of course rather unnecessary, as any overrides can be made directly after the mixin call.
 
 ## Media query bubbling
 
+`@media` blocks
 ```scss
 p {
     @media (max-width: 768px) {
