@@ -441,9 +441,51 @@ p {
 }
 ```
 
-## Extending classes
+## Extending selectors
 
-...with multiple inheritance.
+SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend) by combining them in the CSS output.  Interestingly, while the mechanism is (obviously) very different, the semantics of `@extend` are very analogous to traditional object-oriented languages such as Java:
+```scss
+.animal {
+    background: gray;
+}
+.cat {
+    @extend .animal;
+    color: white;
+}
+```
+```css
+/* compiled CSS */
+.animal, .cat {
+  background: gray;
+}
+.cat {
+  color: white;
+}
+```
+That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling that comes later in the file always wins over the styling that came before it (unless of course the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity)).  Extending selectors is often preferable to using mixins to achieve the same effect:
+```scss
+@mixin animal {
+    background: gray;
+}
+.animal {
+    @include animal;
+}
+.cat {
+    @include animal;
+    color: white;
+}
+```
+In a non-contrived example, the base `.animal` styling would be more complex, and all properties that the mixin emits would be repeated in the resulting CSS, as many times as the mixin is used.  In contrast, selector extension allows each style block to be output just once, but with all necessary selectors included.
+
+Finally, selector extension allows for integrations into 3rd party CSS libraries, that need not be specifically designed for extension, or even be written in SCSS.  [Twitter Bootstrap](http://twitter.github.io/bootstrap/), for example, includes nice styling for buttons, but doesn't apply it to `<button>` elements by default.  In our quest to reduce unnecessary CSS classes, we can fix this simply with:
+```scss
+@import "bootstrap.scss"; // just a renamed .css file, so that @import works
+
+button {
+    @extend .btn;
+}
+```
+This will add the `button` selector into the Bootstrap source wherever `.btn` is referenced.
 
 ## Placeholder selectors
 
