@@ -540,7 +540,6 @@ Notice how only the last property (`color`) is different.  As we define more typ
   color: black;
 }
 ```
-
 Finally, selector extension allows for integrations into 3rd party CSS libraries, that need not be specifically designed for extension, or even be written in SCSS.  [Twitter Bootstrap](http://twitter.github.io/bootstrap/), for example, includes nice styling for buttons, but doesn't apply it to `<button>` elements by default.  In our quest to reduce unnecessary CSS classes, we can fix this simply with:
 ```scss
 @import "bootstrap.scss"; // just a renamed .css file, so that @import works
@@ -552,5 +551,38 @@ button {
 This will add the `button` selector into the Bootstrap source wherever `.btn` is referenced.
 
 ## Placeholder selectors
+
+Because in the above example(s) the `.animal` base class isn't really used anywhere directly, having such a superfluous class name in the CSS output may seem unnecessary.  SCSS allows you to overcome this with [placeholder selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders) - whereas `.foo` signifies a class, and `#foo` an ID, `%foo` is considered a placeholder, and gets special treatment by the parser: its styles are never output on their own, only through extension.
+```scss
+%animal {
+    background: gray;
+    // and so on...
+}
+.cat {
+    @extend %animal;
+    color: white;
+}
+.dog {
+    @extend %animal;
+    color: black;
+}
+```
+```css
+/* compiled CSS */
+.cat, .dog {
+  background: gray;
+}
+.cat {
+  color: white;
+}
+.dog {
+  color: black;
+}
+```
+Because `%animal` was just a placeholder selector, it's disappeared from the output.  As an added benefit, if you never define a selector that extends `%animal`, its styles (`background: gray;` and so on) are completely omitted.  This can be very useful in SCSS framework authoring, as you can offer any number of base classes for opt-in extension, but only the ones actually *used* are output into the resulting CSS.
+
+Placeholder selectors can actually do even more than this, namely expanding the `%placeholder` part into a more complex selector during `@extend`, but personally I've never had to use this feature.  The interested reader can check out the [docs on the subject](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders).
+
+## Selector multiple inheritance
 
 TODO
