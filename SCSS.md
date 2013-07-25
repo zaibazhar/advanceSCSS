@@ -443,7 +443,7 @@ p {
 
 ## Extending selectors
 
-SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend) by combining them in the CSS output.  Interestingly, while the mechanism is (obviously) very different, the semantics of `@extend` are very analogous to traditional object-oriented languages such as Java:
+SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend), by copying and combining selectors in the CSS output.  Interestingly, while the mechanism is (obviously) very different, the semantics of `@extend` are quite analogous to traditional object-oriented programming languages (such as Java & whatnot):
 ```scss
 .animal {
     background: gray;
@@ -462,20 +462,84 @@ SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REF
   color: white;
 }
 ```
-That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling that comes later in the file always wins over the styling that came before it (unless of course the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity)).  Extending selectors is often preferable to using mixins to achieve the same effect:
+That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Whereas in normal CSS you would have to reference both the extending class and the parent class (e.g. `<div class="animal cat"></div>`), now you can only name the exact class you want, regardless of what it inherits from (`<div class="cat"></div>`).
+
+Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling that comes later in the file always wins over the styling that came before it (unless the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity), which is something to watch out for when extending selectors).  Extending selectors may often be preferable to using mixins to achieve the same effect:
 ```scss
 @mixin animal {
     background: gray;
-}
-.animal {
-    @include animal;
+    border: 1px solid red;
+    font-weight: bold;
+    font-size: 50px;
+    color: red;
+    padding: 20px;
 }
 .cat {
     @include animal;
     color: white;
 }
+.dog {
+    @include animal;
+    color: black;
+}
 ```
-In a non-contrived example, the base `.animal` styling would be more complex, and all properties that the mixin emits would be repeated in the resulting CSS, as many times as the mixin is used.  In contrast, selector extension allows each style block to be output just once, but with all necessary selectors included.
+```css
+/* compiled CSS */
+.cat {
+  background: gray;
+  border: 1px solid red;
+  font-weight: bold;
+  font-size: 50px;
+  color: red;
+  padding: 20px;
+  color: white;
+}
+.dog {
+  background: gray;
+  border: 1px solid red;
+  font-weight: bold;
+  font-size: 50px;
+  color: red;
+  padding: 20px;
+  color: black;
+}
+```
+Notice how only the last property (`color`) is different.  As we define more types of animals, the amount of repeated style properties keeps growing.  This is in contrast to how selector extension would solve the same problem:
+```scss
+.animal {
+    background: gray;
+    border: 1px solid red;
+    font-weight: bold;
+    font-size: 50px;
+    color: red;
+    padding: 20px;
+}
+.cat {
+    @extend .animal;
+    color: white;
+}
+.dog {
+    @extend .animal;
+    color: black;
+}
+```
+```css
+/* compiled CSS */
+.animal, .cat, .dog {
+  background: gray;
+  border: 1px solid red;
+  font-weight: bold;
+  font-size: 50px;
+  color: red;
+  padding: 20px;
+}
+.cat {
+  color: white;
+}
+.dog {
+  color: black;
+}
+```
 
 Finally, selector extension allows for integrations into 3rd party CSS libraries, that need not be specifically designed for extension, or even be written in SCSS.  [Twitter Bootstrap](http://twitter.github.io/bootstrap/), for example, includes nice styling for buttons, but doesn't apply it to `<button>` elements by default.  In our quest to reduce unnecessary CSS classes, we can fix this simply with:
 ```scss
