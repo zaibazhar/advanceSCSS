@@ -462,9 +462,9 @@ SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REF
   color: white;
 }
 ```
-That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Whereas in normal CSS you would have to reference both the extending class and the parent class (e.g. `<div class="animal cat"></div>`), now you can only name the exact class you want, regardless of what it inherits from (`<div class="cat"></div>`).
+That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Whereas in normal CSS you would have to reference both the extending class and the parent class (e.g. `<div class="animal cat">`), now you can only name the exact class you want (`<div class="cat">`).  What it does (or doesn't) inherit from depends on the definition of `.cat`.
 
-Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling that comes later in the file always wins over the styling that came before it (unless the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity), which is something to watch out for when extending selectors).  Extending selectors may often be preferable to using mixins to achieve the same effect:
+Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling for the same selector that comes later in the file always wins over the styling that came before it.  Perhaps a bit unintuitively, this actually works out fine even if the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity) (think `.class` overriding an `#id`).  Extending selectors may often be preferable to using mixins to achieve the same effect:
 ```scss
 @mixin animal {
     background: gray;
@@ -552,7 +552,7 @@ This will add the `button` selector into the Bootstrap source wherever `.btn` is
 
 ## Placeholder selectors
 
-Because in the above example(s) the `.animal` base class isn't really used anywhere directly, having such a superfluous class name in the CSS output may seem unnecessary.  SCSS allows you to overcome this with [placeholder selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders) - whereas `.foo` signifies a class, and `#foo` an ID, `%foo` is considered a placeholder, and gets special treatment by the parser: its styles are never output on their own, only through extension.
+Because in the above example(s) the `.animal` base class isn't used anywhere directly (only through its child classes), we might just as well get rid of it in the CSS output.  SCSS allows this with [placeholder selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders) - whereas `.foo` signifies a class, and `#foo` an ID, `%foo` is considered a placeholder, and gets special treatment by the parser: its styles are never output on their own, only through extension.
 ```scss
 %animal {
     background: gray;
