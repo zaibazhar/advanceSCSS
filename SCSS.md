@@ -585,4 +585,40 @@ Placeholder selectors can actually do even more than this, namely expanding the 
 
 ## Selector multiple inheritance
 
-TODO
+A selector can actually inherit from *several* other selectors - that is, SCSS supports multiple inheritance.  For each `@extend`, the current selector is appended to the selector being extended.  When combined with placeholder selectors, this allows powerful abstractions for styling framework authors.  This is perhaps best explained through an example:
+```scss
+// in the framework files:
+%mfw-standing-out {
+    font-size: 150%;
+    font-style: italic;
+    padding: 25px;
+}
+%mfw-slightly-shadowed {
+    @include box-shadow(black 2px 2px 10px); // from Compass
+}
+%mfw-rounded {
+    @include border-radius(25px); // from Compass
+}
+
+// in the application files:
+#join-button {
+    @extend %mfw-standing-out;
+    @extend %mfw-slightly-shadowed;
+    @extend %mfw-rounded;
+    background: green;
+    color: white;
+}
+```
+This way of constructing styling has a few notable benefits:
+
+ * **Self-documentation:** Instead of writing out loads of anonymoud style properties, the author instead describes the "traits" of the UI component he is designing.
+ * **Naming isolation:** The application can use its own naming conventions and semantics in the HTML, while the framework naming conventions never make their way into the compiled CSS.  In the above example, the framework adopts a common prefix `%mfw` (for "my framework", or whatever) to avoid naming collisions with other SCSS libraries.
+ * **Reduced repetition:** The `#join-button` could use the `border-radius()` and `box-shadow()` helpers directly to achieve the same stylistic effect.  But for each additional component that does so, the `box-shadow()` helper would output the exact same lines of CSS, with all the vendor prefixes and whatnot.  Extending `%mfw-slightly-shadowed`, however, would simply append the selector to the list of other selectors that should receive shadowing.
+ * **Opt-in:** If a specific "trait" is never used to describe some UI component, its styles are never output.  That is, if you just use 1% of the features of a bloated style framework, your CSS payload will only contain that 1%.  Contrast this to the de-facto way of just including an entire Bootstrap or jQuery, because the site uses 1 or 2 features from each.
+
+Potential downsides with this approach should be kept in mind:
+
+ * **Debuggability:** Without properly configured [source maps for SCSS](http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector), it may be harder to figure out how some styling ended up affecting a specific element (keep in mind the above point about *self-documentation* no longer applies in the compiled CSS).
+ * **Arguments:** This technique won't replace mixins when computation is required based on some arguments.  While there can be several versions of each "trait" (think `%mfw-slightly-shadowed` vs `%mfw-heavily-shadowed`), they'll always be completely static in content.
+
+...and that's it!
