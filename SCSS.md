@@ -1,16 +1,21 @@
-# N cool things you may not have known about SCSS
+# Advanced SCSS
 
-## Things you probably knew already...
+Or, **16 cool things you may not have known your stylesheets could do.**  I'd rather have kept it to a nice round number like 10, but they just kept coming.  Sorry.
 
-...but are always worth mentioning, because they're incredibly cool compared to vanilla CSS:
+This isn't an [introduction to the language](http://sass-lang.com/tutorial.html) by a long shot; many things probably won't make sense unless you have some SCSS under your belt already.  That said, if you're not yet comfy with the basics, check out the awesome CSS extensions you've always wished you had:
 
  * [Nested selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#css_extensions)
  * [Variables](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variables_)
  * [Mixins](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins)
+ * and loads more
 
-## Prefixing parent selector references
+Also, if you have any questions, comments or corrections, leave a comment below, or fork this gist and let me know!
 
-This is the familiar way:
+So without further ado, on to the *cool things*.  The tips are vaguely ordered from basic to more advanced.  If you're immediately bored, feel free to skip ahead to the deep end of the pool.
+
+## 1. Prefixing parent selector references
+
+This is the familiar way you're probably using `&`:
 ```scss
 a {
     &:hover {
