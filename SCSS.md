@@ -33,7 +33,7 @@ But `&` can be used with a prefix just as well:
 ```scss
 p {
     body.no-touch & {
-        display: none;
+        display: none; // hide the message if not on a touch device
     }
 }
 ```
@@ -43,9 +43,9 @@ body.no-touch p {
   display: none;
 }
 ```
-This can be very useful when you have a deep nesting of rules already in place, and you want to effect a change to the styling of an element based on a selector match much closer to the DOM root.  Client capability flags such as the [Modernizr](http://modernizr.com/docs/) `no-touch` class are often applied this way to the `<body>` element.
+This can be very useful when you have a deep nesting of rules, and you want to effect a change to the styling of an element based on a selector match much closer to the DOM root.  Client capability flags such as the [Modernizr](http://modernizr.com/docs/) `no-touch` class are often applied this way to the `<body>` element.  This way you don't have to back out of your nesting just to be able to change your `<p>` styling based on a class on the `<body>`.
 
-## Variable interpolation in selectors
+## 2. Variable expansion in selectors
 
 Variables can be expanded in selectors, too:
 ```scss
@@ -76,9 +76,9 @@ $breakpoint: 768px;
 }
 ```
 
-The media query example is particularly useful if the `$breakpoint` variable is defined in a `_settings.scss`, so the breakpoints of the entire application are configurable from one file.
+The media query example is particularly useful if the `$breakpoint` variable is defined in a settings partial somewhere (say, `_settings.scss`), so the breakpoints of the entire application are configurable from one file.
 
-## Variable defaults
+## 3. Variable defaults
 
 If your SCSS module can be configured using globals (which tends to be the SCSS way), you can declare them with a default value:
 ```scss
@@ -110,7 +110,7 @@ That is, an assignment with a `!default` will only take effect if such a variabl
 
 This is how many SCSS modules (including most that ship with Compass) are configured.
 
-## Control directives
+## 4. Control directives
 
 SCSS sports the standard set of flow control directives, such as `if`:
 ```scss
@@ -152,13 +152,13 @@ There's also `@for`, `@each` and `@while`.  They're good for a number of use cas
   background-image: url("/images/help.png");
 }
 ```
-...and much more.  Keep in mind, though, that if you need them in your daily styling work you're probably overdoing it.  Instead, they usually warrant the added complexity when building configurable SCSS modules and other such reusable components.
+...and much more.  Keep in mind, though, that if you need them in your daily styling work you're probably overdoing it a bit.  Instead, the added complexity is usually justified when building configurable SCSS modules and such.
 
 The interested reader can check out the [full documentation on control directives](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#control_directives).
 
-## The list data type
+## 5. The list data type
 
-As we saw in the previous example, `@each` can iterate over a list.  Lists are in fact a [fundamental part](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#lists) of the SCSS language, but a quick demo of their application might be configuring some generated styling:
+As we saw in the previous example, `@each` can iterate over a list.  Lists are in fact a [fundamental part](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#lists) of the SCSS language, but a quick demonstration of their usefulness might be configuring some generated styling:
 ```scss
 $buttonConfig: 'save' 50px, 'cancel' 50px, 'help' 100px; // TODO: move to _settings.scss
 
@@ -186,12 +186,12 @@ var buttonConfig = [[ 'save', 50 ], [ 'cancel', 50 ], [ 'help', 100 ]];
 ```
 That is, lists can be separated by both spaces and commas, and alternation between the two notations produces nested lists.
 
-## Defining custom functions
+## 6. Defining custom functions
 
 [Mixins](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins) are a well-known part of the language, but SCSS also allows you to define custom functions.  Contrary to what one might expect, this can also be done in pure SCSS, instead of [extending SCSS in Ruby](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html#adding_custom_functions):
 ```scss
 @function make-greener($value) {
-    @return $value + rgb(0,50,0); // arithmetic with colors is _b
+    @return $value + rgb(0,50,0); // arithmetic with colors is totally fine, btw
 }
 p {
     background: make-greener(gray);
@@ -205,12 +205,11 @@ p {
 ```
 The above color is a gray with a slight green tint.
 
-Functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents that computation by giving it a name: the above example, while contrived, is still more understandable than just having arbitrary color arithmetic in the style block.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own helper.
+Custom functions are most useful in avoiding some repeated computation in an expression.  It also implicitly documents that computation by giving it a name: the above example, while contrived, is still more understandable than just having arbitrary color arithmetic in the style block.  SCSS ships with a ton of [useful built-in functions](http://sass-lang.com/docs/yardoc/Sass/Script/Functions.html), and Compass [adds even more](http://compass-style.org/reference/compass/helpers/), so do first check whether there's a built-in equivalent before implementing your own.
 
-## Argument defaults
+## 7. Argument defaults
 
-Arguments and functions support default values for arguments; the *last* zero-to-N arguments can be made optional by providing them with a default value:
-
+Mixins and functions support default values for arguments; the *last* zero-to-N arguments can be made optional by providing them with a default value:
 ```scss
 @mixin foobar($a, $b, $padding: 20px) {
     padding: $padding;
@@ -226,23 +225,24 @@ p.important {
 }
 ```
 
-## Keyword arguments
+## 8. Keyword arguments
 
-If your mixin (or function) takes *a lot* of arguments, there's a similar call-time syntax for selecting only specific arguments to override:
-
+If your mixin (or function) takes *a lot* of arguments, there's a similar call-time syntax for selecting specific arguments to override:
 ```scss
-@mixin foobar($topPadding: 10px, $rightPadding: 20px, $bottomPadding: 10px, $leftPadding: 20px, $evenMorePadding: 10px) {
+@mixin foobar($topPadding: 10px, $rightPadding: 20px,
+    $bottomPadding: 10px, $leftPadding: 20px, $evenMorePadding: 10px) {
     // do something with all these arguments...
 }
 
 p {
-    @include foobar($bottomPadding: 50px); // specify only the argument you want to override
+    @include foobar($bottomPadding: 50px);
 }
 ```
+Without being able to name arguments call-time, you'd have to specify `$topPadding` and `$rightPadding` first.  Now, you can instead override *only* the argument you want, leaving the rest to their default values.
 
-However, in cases where a lot of the arguments are just for overriding specific CSS properties (such as `top-padding`, `bottom-padding` and so on), the "content block overrides -pattern" is likely a better fit (see below).
+Note, however, that in cases where a lot of the arguments are just for overriding specific CSS properties (such as `top-padding`, `bottom-padding` and so on), the "content block overrides -pattern" is likely a better fit (see below).
 
-## Variable arguments for functions/mixins
+## 9. Variable arguments for functions/mixins
 
 [Var-args](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_arguments) work much the same way as in other languages that support the feature; any extra arguments to a function/mixin call are wrapped into a list and assigned to the argument having a `...` suffix:
 
@@ -626,4 +626,6 @@ Potential downsides with this approach should be kept in mind:
  * **Debuggability:** Without properly configured [source maps for SCSS](http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector), it may be harder to figure out how some styling ended up affecting a specific element (keep in mind the above point about *self-documentation* no longer applies in the compiled CSS).
  * **Arguments:** This technique won't replace mixins when computation is required based on some arguments.  While there can be several versions of each "trait" (think `%mfw-slightly-shadowed` vs `%mfw-heavily-shadowed`), they'll always be completely static in content.
 
-...and that's it!
+## And that's it
+
+Closing words..?
