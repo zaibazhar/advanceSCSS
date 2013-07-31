@@ -240,7 +240,7 @@ p {
 ```
 Without being able to name arguments call-time, you'd have to specify `$topPadding` and `$rightPadding` first.  Now, you can instead override *only* the argument you want, leaving the rest to their default values.
 
-Note, however, that in cases where a lot of the arguments are just for overriding specific CSS properties (such as `top-padding`, `bottom-padding` and so on), the "content block overrides -pattern" is likely a better fit (see below).
+Note, however, that in cases where a lot of the arguments are just for overriding specific CSS properties (such as `top-padding`, `bottom-padding` and so on), the "content block overrides" -pattern is likely a better fit (see below).
 
 ## 9. Variable arguments for functions/mixins
 
@@ -290,7 +290,7 @@ $myArgs: 5px red "bla bla";
 
 Personally, I have yet to find a use case for this, but [the documentation](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#variable_arguments) has a nice use case for passing current arguments forward to another mixin.
 
-## Content block arguments for mixins
+## 10. Content block arguments for mixins
 
 Since [version 3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#320_10_august_2012), SCSS has had an implicit mixin argument accessible through the `@content` directive.  It allows passing an entire SCSS content block as an argument to the mixin:
 
@@ -316,7 +316,7 @@ Since [version 3.2.0](http://sass-lang.com/docs/yardoc/file.SASS_CHANGELOG.html#
 }
 ```
 
-This is a very powerful language feature.  You can mix standard and content block arguments, too:
+This is a *very* powerful language feature for framework authors, as it allows you to pass arbitrary blocks of styling around, which you can choose to wrap in specific selectors, repeat in loops, make conditional with `@if`, etc.  You can mix standard and content block arguments, too:
 
 ```scss
 @mixin only-for-mobile($breakpoint) {
@@ -332,9 +332,9 @@ This is a very powerful language feature.  You can mix standard and content bloc
 }
 ```
 
-## Content block overrides -pattern
+## 11. Content block overrides -pattern
 
-Consider a mixin that generates a selector and a corresponding style block, allowing the caller to customize the styling if needed:
+Consider a mixin that generates a selector and some styles for it, allowing the caller to customize the styling if needed:
 ```scss
 @mixin message($class, $color: yellow, $margin: 20px, $padding: 10px) {
     .message-#{$class} {
@@ -378,7 +378,7 @@ But this requires you to list *all overridable properties* in the mixin signatur
 Here, we allow the good-ole CSS cascade to effect the property override (the latter `margin` overrides the former one).  Also, we're not limited to overriding the properties the author of the mixin thought of.  In fact, this allows passing in nested blocks as well:
 ```scss
 @include message("actionable") {
-    button {
+    button { // actionable messages may contain buttons for taking action!
         float: right;
     }
 }
@@ -395,33 +395,47 @@ Here, we allow the good-ole CSS cascade to effect the property override (the lat
   float: right;
 }
 ```
-This pattern can be useful in any library code that outputs nontrivial styling with generated selectors; in simple cases (where no selectors are emitted within the mixin) it's of course rather unnecessary, as any overrides can be made directly after the mixin call.
+This pattern can be useful in any library code that outputs nontrivial styling with generated selectors, since it allows the user a customization point beyond what the library author foresaw.  Note, though, that in simple cases (where no selectors are emitted within the mixin) it's rather unnecessary, as any overrides can be made just using the standard CSS cascade.
 
-## Media query bubbling
+## 12. Media query bubbling
 
 `@media` blocks do not need to be declared at the root level of the stylesheet:
 ```scss
-p {
-    @media (max-width: 768px) {
-        font-size: 150%; // use larger text for smaller screens
+body {
+    article {
+        p {
+            font-size: 100%;
+            color: black;
+            padding: 10px;
+
+            @media (max-width: 768px) {
+                font-size: 150%; // use larger text for smaller screens
+            }
+        }
     }
 }
 ```
 ```css
 /* compiled CSS */
+body article p {
+  font-size: 100%;
+  color: black;
+  padding: 10px;
+}
+
 @media (max-width: 768px) {
-  p {
+  body article p {
     font-size: 150%;
   }
 }
 ```
-Notice how the compiler "bubbles up" the `@media` block to the root level (since regular CSS doesn't support selector nesting), and then outputs within all styling and the corresponding selectors that were encountered within the `@media` block in the SCSS source.
+Notice how the compiler "bubbles up" the `@media` block to the root level (since regular CSS doesn't support selector nesting), and within it, outputs all styling that was encountered within the `@media` block in the SCSS source.
 
 This is very useful as it allows you to make media-specific tweaks almost anywhere in your styling, right where they're relevant, instead of collecting all those tweaks to the end of the stylesheet, and hoping that their selectors will stay in sync with the ones they're overriding (they won't).
 
-## Media query nesting
+## 13. Media query nesting
 
-The aforementioned bubbling mechanism also takes nesting into account, and combines all applicable queries with the `and` media query operator:
+The aforementioned bubbling mechanism also takes nesting into account, and combines all applicable queries with the `and` operator:
 ```scss
 p {
     @media (max-width: 768px) {
@@ -446,7 +460,7 @@ p {
 }
 ```
 
-## Extending selectors
+## 14. Extending selectors
 
 SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extend), by copying and combining selectors in the CSS output.  Interestingly, while the mechanism is (obviously) very different, the semantics of `@extend` are quite analogous to traditional object-oriented programming languages (such as Java & whatnot):
 ```scss
@@ -467,9 +481,9 @@ SCSS allows [extending selectors](http://sass-lang.com/docs/yardoc/file.SASS_REF
   color: white;
 }
 ```
-That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Whereas in normal CSS you would have to reference both the extending class and the parent class (e.g. `<div class="animal cat">`), now you can only name the exact class you want (`<div class="cat">`).  What it does (or doesn't) inherit from depends on the definition of `.cat`.
+That is, `.cat` has all the properties of its "parent class" `.animal`, plus any specific ones it adds or overrides.  Whereas in normal CSS you would have to reference both the extending class and the parent class (e.g. `<div class="animal cat">`), now you can just name the exact class you want (`<div class="cat">`).  What it does (or doesn't) inherit from depends on the definition of `.cat`, and can later change without touching the markup.
 
-Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling for the same selector that comes later in the file always wins over the styling that came before it.  Perhaps a bit unintuitively, this actually works out fine even if the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity) (think `.class` overriding an `#id`).  Extending selectors may often be preferable to using mixins to achieve the same effect:
+Classical inheritance, right?  Overriding properties in the "child class" works due to the style cascade in the browser: styling for the same selector that comes later in the file always wins over the styling that came before it.  Perhaps a bit unintuitively, this actually works out fine even if the combined selectors have differing [specificity](http://www.w3.org/TR/css3-selectors/#specificity) (think `.class` extending an `#id`).  Extending selectors may often be preferable to using mixins to achieve the same effect:
 ```scss
 @mixin animal {
     background: gray;
@@ -509,7 +523,7 @@ Classical inheritance, right?  Overriding properties in the "child class" works 
   color: black;
 }
 ```
-Notice how only the last property (`color`) is different.  As we define more types of animals, the amount of repeated style properties keeps growing.  This is in contrast to how selector extension would solve the same problem:
+Notice how only the last property (`color`) is different, the rest is the same.  As we define more types of animals, the amount of repeated style properties in the CSS output keeps growing.  This is in contrast to how selector extension would solve the same problem:
 ```scss
 .animal {
     background: gray;
@@ -545,7 +559,7 @@ Notice how only the last property (`color`) is different.  As we define more typ
   color: black;
 }
 ```
-Finally, selector extension allows for integrations into 3rd party CSS libraries, that need not be specifically designed for extension, or even be written in SCSS.  [Twitter Bootstrap](http://twitter.github.io/bootstrap/), for example, includes nice styling for buttons, but doesn't apply it to `<button>` elements by default.  In our quest to reduce unnecessary CSS classes, we can fix this simply with:
+Finally, selector extension allows for integrations into 3rd party CSS libraries, that need not be specifically designed for extension, or even be written in SCSS.  [Twitter Bootstrap](http://twitter.github.io/bootstrap/), for example, includes nice styling for buttons with `.btn`, but doesn't apply it to `<button>` elements by default.  In our quest to reduce unnecessary CSS classes, we can fix this simply with:
 ```scss
 @import "bootstrap.scss"; // just a renamed .css file, so that @import works
 
@@ -553,11 +567,13 @@ button {
     @extend .btn;
 }
 ```
-This will add the `button` selector into the Bootstrap source wherever `.btn` is referenced.
+This will add the `button` selector into the Bootstrap source wherever `.btn` is defined.
 
-## Placeholder selectors
+The extension mechanism is surprisingly clever even with [more complex selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#extending_complex_selectors), and allows [chaining extends](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#chaining_extends) (think `.cat` extends `.feline` extends `.animal`), but with great power comes great responsibility: overly [neat tricks](http://thedailywtf.com/Articles/Classic-WTF-Now-Thats-A-Neat-Trick.aspx) with `@extend` may be hard to reason about when debugging styles.  Use responsibly.
 
-Because in the above example(s) the `.animal` base class isn't used anywhere directly (only through its child classes), we might just as well get rid of it in the CSS output.  SCSS allows this with [placeholder selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders) - whereas `.foo` signifies a class, and `#foo` an ID, `%foo` is considered a placeholder, and gets special treatment by the parser: its styles are never output on their own, only through extension.
+## 15. Placeholder selectors
+
+Because in the above example(s) the `.animal` base class isn't used anywhere directly (only through its child classes), we might just as well get rid of it in the CSS output.  SCSS allows this with [placeholder selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders).  Whereas `.foo` signifies a class, and `#foo` an ID, `%foo` is considered a placeholder, and gets special treatment by the compiler: its styles are never output on their own, only through extension.
 ```scss
 %animal {
     background: gray;
@@ -584,11 +600,11 @@ Because in the above example(s) the `.animal` base class isn't used anywhere dir
   color: black;
 }
 ```
-Because `%animal` was just a placeholder selector, it's disappeared from the output.  As an added benefit, if you never define a selector that extends `%animal`, its styles (`background: gray;` and so on) are completely omitted.  This can be very useful in SCSS framework authoring, as you can offer any number of base classes for opt-in extension, but only the ones actually *used* are output into the resulting CSS.
+Because `%animal` was just a placeholder selector, it's disappeared from the output.  More importantly, if you never define a selector that extends `%animal`, its styles (`background: gray;` and so on) are completely omitted from the output.  This can be very useful for SCSS framework authors, as you can offer any number of base classes for opt-in extension, but only the ones actually *used* are output into the resulting CSS.
 
 Placeholder selectors can actually do even more than this, namely expanding the `%placeholder` part into a more complex selector during `@extend`, but personally I've never had to use this feature.  The interested reader can check out the [docs on the subject](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#placeholders).
 
-## Selector multiple inheritance
+## 16. Selector multiple inheritance
 
 A selector can actually inherit from *several* other selectors - that is, SCSS supports multiple inheritance.  For each `@extend`, the current selector is appended to the selector being extended.  When combined with placeholder selectors, this allows powerful abstractions for styling framework authors.  This is perhaps best explained through an example:
 ```scss
@@ -616,14 +632,14 @@ A selector can actually inherit from *several* other selectors - that is, SCSS s
 ```
 This way of constructing styling has a few notable benefits:
 
- * **Self-documentation:** Instead of writing out loads of anonymoud style properties, the author instead describes the "traits" of the UI component he is designing.
- * **Naming isolation:** The application can use its own naming conventions and semantics in the HTML, while the framework naming conventions never make their way into the compiled CSS.  In the above example, the framework adopts a common prefix `%mfw` (for "my framework", or whatever) to avoid naming collisions with other SCSS libraries.
+ * **Self-documentation:** Instead of writing out loads of anonymous style properties, the author instead lists the "traits" of the UI component he is designing.  The names of the traits can be as long & descriptive as needed (they won't appear in the CSS output).
+ * **Naming isolation:** The application can use whichever naming conventions and semantics in the HTML, while the framework naming conventions stay internal to the SCSS source.  In the above example, the framework adopts a common prefix `%mfw` (for "my framework", or whatever) to avoid naming collisions with other SCSS libraries.
  * **Reduced repetition:** The `#join-button` could use the `border-radius()` and `box-shadow()` helpers directly to achieve the same stylistic effect.  But for each additional component that does so, the `box-shadow()` helper would output the exact same lines of CSS, with all the vendor prefixes and whatnot.  Extending `%mfw-slightly-shadowed`, however, would simply append the selector to the list of other selectors that should receive shadowing.
- * **Opt-in:** If a specific "trait" is never used to describe some UI component, its styles are never output.  That is, if you just use 1% of the features of a bloated style framework, your CSS payload will only contain that 1%.  Contrast this to the de-facto way of just including an entire Bootstrap or jQuery, because the site uses 1 or 2 features from each.
+ * **Opt-in:** If a specific "trait" is never used to describe a UI component, its styles are never output.  That is, if you just use 1% of the features of a bloated style framework, your CSS payload will only contain that 1%.  Contrast this to the de-facto way of just including an entire Bootstrap or jQuery, because the site uses 1 or 2 features from each.
 
 Potential downsides with this approach should be kept in mind:
 
- * **Debuggability:** Without properly configured [source maps for SCSS](http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector), it may be harder to figure out how some styling ended up affecting a specific element (keep in mind the above point about *self-documentation* no longer applies in the compiled CSS).
+ * **Debuggability:** Without properly configured [source maps for SCSS](http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector), it may be harder to figure out how some styling ended up affecting a specific element (keeping in mind the above point about *self-documentation* no longer applies in the compiled CSS).
  * **Arguments:** This technique won't replace mixins when computation is required based on some arguments.  While there can be several versions of each "trait" (think `%mfw-slightly-shadowed` vs `%mfw-heavily-shadowed`), they'll always be completely static in content.
 
 ## And that's it
