@@ -2,6 +2,8 @@
 
 Or, **16 cool things you may not have known your stylesheets could do.**  I'd rather have kept it to a nice round number like 10, but they just kept coming.  Sorry.
 
+I've been using [SCSS/SASS](http://sass-lang.com/) for most of my styling work since 2009, and I'm a huge fan of [Compass](http://compass-style.org/) (by the great [@chriseppstein](https://twitter.com/chriseppstein)).  It really helped many of us through the darkest cross-browser crap.  Even though browsers are increasingly playing nice with CSS, another problem has become very topical: managing the complexity in stylesheets as our in-browser apps get larger and larger.  SCSS is an indispensable tool for dealing with this.
+
 This isn't an [introduction to the language](http://sass-lang.com/tutorial.html) by a long shot; many things probably won't make sense unless you have some SCSS under your belt already.  That said, if you're not yet comfy with the basics, check out the awesome CSS extensions you've always wished you had:
 
  * [Nested selectors](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#css_extensions)
@@ -9,9 +11,9 @@ This isn't an [introduction to the language](http://sass-lang.com/tutorial.html)
  * [Mixins](http://sass-lang.com/docs/yardoc/file.SASS_REFERENCE.html#mixins)
  * and loads more
 
-Also, if you have any questions, comments or corrections, leave a comment below, or fork this gist and let me know!
+The tips are vaguely ordered from basic to more advanced.  If you're immediately bored, feel free to skip ahead to the deep end of the pool.  Also, if you have any questions, comments or corrections, leave a comment below, or fork this gist and let me know!
 
-So without further ado, on to the *cool things*.  The tips are vaguely ordered from basic to more advanced.  If you're immediately bored, feel free to skip ahead to the deep end of the pool.
+So without further ado, on to the *cool things*.
 
 ## 1. Prefixing parent selector references
 
@@ -644,4 +646,12 @@ Potential downsides with this approach should be kept in mind:
 
 ## And that's it
 
-Closing words..?
+Hope you picked up something useful!
+
+There may be more at [my site](http://jrw.fi/) or [@jareware](https://twitter.com/jareware), depending on when you look. :)
+
+Cheers,
+
+\- Jarno
+
+![GA](https://ssl.google-analytics.com/__utm.gif?utmwv=5.4.3&utmn=47004&utmhn=gist.github.com&utmdt=Advanced%20SCSS%2C%20or%2C%2016%20cool%20things%20you%20may%20not%20have%20known%20your%20stylesheets%20could%20do&utmr=-&utmp=%2Fjareware%2F4738651&utmac=UA-42176157-3&utmcc=__utma%3D1.1828258468.1374783534.1374783534.1374783534.1%3B%2B__utmz%3D1.1374783534.1.1.utmcsr%3D(direct\)%7Cutmccn%3D(direct\)%7Cutmcmd%3D(none\)%3B)
