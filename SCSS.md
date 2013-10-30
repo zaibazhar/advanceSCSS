@@ -1,3 +1,5 @@
+[⇐ back to the gist-blog at jrw.fi](http://jrw.fi/)
+
 # Advanced SCSS
 
 Or, **16 cool things you may not have known your stylesheets could do.**  I'd rather have kept it to a nice round number like 10, but they just kept coming.  Sorry.
