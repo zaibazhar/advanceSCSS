@@ -1,4 +1,4 @@
-[⇐ back to the gist-blog at jrw.fi](http://jrw.fi/)
+
 
 # Advanced SCSS
 
